@@ -283,7 +283,7 @@ function PortfolioAlignments() {
                 var data_div = document.createElement("div");
                 if (data_div) {
                     dojo.addClass(data_div, "full_center");
-                    data_div.innerHTML = "No Features Have Preliminary Estimates";
+                    data_div.innerHTML = "No Items Have Preliminary Estimates";
                     dojo.place(data_div, dojo.byId(div_id), "last");
                 }
             } else {
