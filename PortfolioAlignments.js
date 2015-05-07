@@ -255,57 +255,72 @@ function PortfolioAlignments() {
             
             var data = [];
             g_data_sets[title] = {};
+            logme("title:",title);
+            
             var i = 0;
             for (var val in values) {
+                logme("Value:", val);
                 if (values.hasOwnProperty(val)) {
+                    logme("Category:", values[val].InvestmentCategory);
+                    logme("Estimate Ratio:", values[val]._EstimateRatio);
+                    var investment_category = values[val].InvestmentCategory || "unknown category";
                     data.push({ 
                         x: i, 
                         y: values[val]._EstimateRatio, 
-                        color: g_allowed_colors[ values[val].InvestmentCategory ] || '#fff', 
+                        color: g_allowed_colors[ investment_category ] || '#fff', 
                         title: title, 
-                        tooltip: values[val].InvestmentCategory, 
-                        category: values[val].InvestmentCategory 
+                        tooltip: investment_category, 
+                        category: investment_category 
                     });
                     // hold the percentage globally for the tooltip
-                    g_data_sets[title][ values[val].InvestmentCategory ] = Math.round(10 * values[val]._EstimateRatio) / 10;
+                    g_data_sets[title][ investment_category ] = Math.round(10 * values[val]._EstimateRatio) / 10;
                     i++;
                 }
             }
             logme("data:",data);
             
-            var pie_config = { type: "Pie",
-                fontColor: "black",
-                labelOffset: -20,
-                radius: 85
-            };
-            pie = new dojox.charting.Chart2D(div_id);
-            pie.addPlot("default", pie_config);
-            pie.addSeries(title, data);
-            //var tip = new dojox.charting.action2d.Tooltip( pie, "default" );
-            var tip = new dojox.charting.action2d.Tooltip(pie, "default", { text: function (e) {
-                var text = "<em>None</em><br/>";
-                var category = null;
-                if (g_data_sets[ title ]) {
-                    category = data[e.index].category;
-                    text = "<em>" + category + "</em><br>";
-                    if (category != "Not Done") {
-                        if (g_data_sets.Target && g_data_sets.Target[ category ]) {
-                            text += "<strong>Target: </strong>" + g_data_sets.Target[category] + "<br/>";
-                        } else {
-                            text += "<strong>Target: </strong>0<br/>";
-                        }
-                        if (g_data_sets.Planned && g_data_sets.Planned[category]) {
-                            text += "<strong>Planned: </strong>" + g_data_sets.Planned[category];
-                        } else {
-                            text += "<strong>Planned: </strong>0<br/>";
+            if ( data.length === 0 ) {
+                var data_div = document.createElement("div");
+                if (data_div) {
+                    dojo.addClass(data_div, "full_center");
+                    data_div.innerHTML = "No Features Have Preliminary Estimates";
+                    dojo.place(data_div, dojo.byId(div_id), "last");
+                }
+            } else {
+                var pie_config = { type: "Pie",
+                    fontColor: "black",
+                    labelOffset: -20,
+                    radius: 85
+                };
+                pie = new dojox.charting.Chart2D(div_id);
+                pie.addPlot("default", pie_config);
+                pie.addSeries(title, data);
+                //var tip = new dojox.charting.action2d.Tooltip( pie, "default" );
+                var tip = new dojox.charting.action2d.Tooltip(pie, "default", { text: function (e) {
+                    var text = "<em>None</em><br/>";
+                    var category = null;
+                    if (g_data_sets[ title ]) {
+                        category = data[e.index].category;
+                        text = "<em>" + category + "</em><br>";
+                        if (category != "Not Done") {
+                            if (g_data_sets.Target && g_data_sets.Target[ category ]) {
+                                text += "<strong>Target: </strong>" + g_data_sets.Target[category] + "<br/>";
+                            } else {
+                                text += "<strong>Target: </strong>0<br/>";
+                            }
+                            if (g_data_sets.Planned && g_data_sets.Planned[category]) {
+                                text += "<strong>Planned: </strong>" + g_data_sets.Planned[category];
+                            } else {
+                                text += "<strong>Planned: </strong>0<br/>";
+                            }
                         }
                     }
-                }
-
-                return text;
-            } });
-
-            pie.render();
+    
+                    return text;
+                } });
+    
+                pie.render();
+            }
         }
         return pie;
     };
